@@ -97,7 +97,7 @@ class App extends Component {
       cards[currentIndex] = cards[randomIndex];
       cards[randomIndex] = temporaryValue;
     }
-    this.setState({ shuffledCards: cards }, () => {
+    this.setState({ shuffledCards: cards}, () => {
       store.dispatch(setShuffledCards(this.state.shuffledCards));
       this.setStateInLocalStorage();
       this.selectCard();
@@ -263,24 +263,28 @@ class App extends Component {
               <label>Betting coins</label>
               <input type="number" onChange={this.onBetCoinsChange} value={this.state.bettingMoney}></input>
             </div>
-            <div className="section cm">
-              <label>Current coins</label>
-              <span>{this.state.currentMoney}</span>
+            <div className="game-coins">
+              <div className="section cm">
+                <label>Current coins</label>
+                <span>{this.state.currentMoney}</span>
+              </div>
+              <div className="section bm">
+                <label>Bet coins</label>
+                <span>{this.state.betMoney}</span>
+              </div>
             </div>
-            <div className="section bm">
-              <label>Bet coins</label>
-              <span>{this.state.betMoney}</span>
+            <div class="section hl">
+              <button 
+                className={this.state.bettingMoney > this.state.currentMoney || this.state.guess !== '' || this.state.bettingMoney <= 0? 'Btn primary disabled' : 'Btn primary'}
+                onClick={() => this.onHighLowClick(-1)}>
+                  Lower
+                </button>
+              <button
+                className={this.state.bettingMoney > this.state.currentMoney || this.state.guess !== '' || this.state.bettingMoney <= 0 ? 'Btn secondary disabled' : 'Btn secondary'}
+                onClick={() => this.onHighLowClick(1)}>
+                  Higher
+              </button>
             </div>
-            <button 
-              className={this.state.bettingMoney > this.state.currentMoney || this.state.guess !== '' || this.state.bettingMoney <= 0? 'Btn primary disabled' : 'Btn primary'}
-              onClick={() => this.onHighLowClick(-1)}>
-                Lower
-              </button>
-            <button
-              className={this.state.bettingMoney > this.state.currentMoney || this.state.guess !== '' || this.state.bettingMoney <= 0 ? 'Btn secondary disabled' : 'Btn secondary'}
-              onClick={() => this.onHighLowClick(1)}>
-                Higher
-              </button>
           </div>
           <div className="Footer">
             <button className="Btn primary" onClick={() => this.postProcessLoss()}>New Game</button>

@@ -16,6 +16,7 @@
   display: grid;
   grid-template-columns: 1fr;
   grid-row-gap: 1em;
+  width: 100%;
   padding-bottom: 50%;
   border-bottom: 1px solid #28CC42;
 }
@@ -28,6 +29,7 @@
 .Header .top .section.betm {
   justify-items: flex-start;
   color: #28CC42;
+  margin-bottom: 1em;
 }
 .Header .top .section input {
   background-color: transparent;
@@ -39,6 +41,7 @@
 }
 .Header .top .section.cm {
   color: #28CC42;
+  margin-bottom: .5em;
 }
 .Header .top .section.cm span{
   font-size: 1.5em;
@@ -67,6 +70,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 10em;
+  z-index: 9;
 }
 .Main .Guess svg {
   max-width: 75%;
@@ -102,6 +106,7 @@
   background-color: transparent;
   border: 1px solid;
   border-radius: 50px;
+  width: 100%;
   cursor: pointer;
   transition: .3s all linear;
   outline: none;
@@ -127,4 +132,38 @@
   pointer-events: none;
   user-select: none;
   cursor: not-allowed;
+}
+@media only screen and (max-width: 876px) {
+  .App {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .Header .top {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-row-gap: 1em;
+    padding-bottom: 5%;
+    border-bottom: none;
+  }
+  .Header .top .section {
+    justify-items: center;
+  }
+  .Header .top .section.betm {
+    justify-items: center;
+  }
+  .Header .top .game-coins {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .Header .top .section.hl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: .5em;
+  }
+  .Footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: .5em;
+    width: 100%;
+  }
 }
