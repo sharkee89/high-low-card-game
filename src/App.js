@@ -273,7 +273,7 @@ class App extends Component {
                 <span>{this.state.betMoney}</span>
               </div>
             </div>
-            <div class="section hl">
+            <div className="section hl">
               <button 
                 className={this.state.bettingMoney > this.state.currentMoney || this.state.guess !== '' || this.state.bettingMoney <= 0? 'Btn primary disabled' : 'Btn primary'}
                 onClick={() => this.onHighLowClick(-1)}>
