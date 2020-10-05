@@ -6,6 +6,10 @@ This project represents demo High Low Card Game done in React/Redux
 
 Clone repository into local folder.
 
+### `cd high-low-card-game`
+
+Go into project folder
+
 ### `yarn install`
 
 Install dependencies into node_modules folder.
