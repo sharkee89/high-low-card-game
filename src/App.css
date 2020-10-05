@@ -1,38 +1,130 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+  display: grid;
+  grid-template-columns: 1fr 4fr;
   min-height: 100vh;
+}
+.Header {
+  background-color: #141414;
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
   align-items: center;
+  padding: 1em;
+  border-right: 1px solid #DE0131;
+}
+.Header .top {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-row-gap: 1em;
+  padding-bottom: 50%;
+  border-bottom: 1px solid #28CC42;
+}
+.Header .top .section {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-row-gap: .5em;
+  justify-items: flex-end;
+}
+.Header .top .section.betm {
+  justify-items: flex-start;
+  color: #28CC42;
+}
+.Header .top .section input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #28CC42;
+  padding: .5em;
+  color: #28CC42;
+  outline-color: #28CC42;
+}
+.Header .top .section.cm {
+  color: #28CC42;
+}
+.Header .top .section.cm span{
+  font-size: 1.5em;
+  text-shadow: 1px 1px 2px #28CC42, 0 0 25px #28CC42, 0 0 5px #28CC42;
+}
+.Header .top .section.bm {
+  color: #DE0131;
+}
+.Header .top .section.bm span{
+  font-size: 1.5em;
+  text-shadow: 1px 1px 2px #DE0131, 0 0 25px #DE0131, 0 0 5px #DE0131;
+}
+.Header .right {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column-gap: 1em;
+}
+.Main {
+  position: relative;
+  background-color: #2D3640;
+  padding: 1em;
+}
+.Main .Guess {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10em;
+}
+.Main .Guess svg {
+  max-width: 75%;
+}
+.Main .Cards img {
+  position: relative;
+}
+.Main .Cards .CardsUnknown {
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
-
-.App-link {
-  color: #61dafb;
+.Main .Cards .CardsUnknown img.exist {
+  margin: 0 1em;
+  padding: .5em;
+  border: 1px solid #ffffff;
+  box-shadow: 0px 0px 5px 3px #ffffff
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.Main .Cards .CardsOnTable {
+  padding: 1em;
+  /* border-left: 1px solid #28CC42;
+  border-right: 1px solid #28CC42; */
+  /* box-shadow: 0px 0px 5px 3px #28CC42; */
+  margin-top: 3em;
+}
+.Footer {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-row-gap: .5em;
+  width: 100%;
+}
+.Btn {
+  padding: 1em;
+  background-color: transparent;
+  border: 1px solid;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: .3s all linear;
+  outline: none;
+}
+.Btn.primary {
+  border-color: #DE0131;
+  color: #DE0131;
+}
+.Btn.primary:hover {
+  background-color: #DE0131;
+  color: #ffffff;
+}
+.Btn.secondary {
+  border-color: #28CC42;
+  color: #28CC42;
+}
+.Btn.secondary:hover {
+  background-color: #28CC42;
+  color: #ffffff;
+}
+.disabled {
+  opacity: .5;
+  pointer-events: none;
+  user-select: none;
+  cursor: not-allowed;
 }
