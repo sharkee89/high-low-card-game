@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Config from './Config';
 import correctSound from './sound/correct.wav';
@@ -313,6 +312,7 @@ class App extends Component {
               {this.state.cardsOnTable.map((card, index) => (
                   <img
                     key={index}
+                    alt=""
                     src={process.env.PUBLIC_URL + '/images/' + card.number + '-' + card.symbol + '.png'}
                   /> 
               ))}
