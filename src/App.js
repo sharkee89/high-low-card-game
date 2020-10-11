@@ -3,6 +3,8 @@ import './App.css';
 import Config from './Config';
 import correctSound from './sound/correct.wav';
 import wrongSound from './sound/wrong.mp3';
+import loseSound from './sound/lose.mp3';
+import winSound from './sound/win.wav';
 import {
   setShuffledCards,
   setCardsOnTable,
@@ -18,6 +20,10 @@ class App extends Component {
 
   constructor(props){
     super(props);
+    this.canvasRef = React.createRef();
+    this.canvas = this.canvasRef.current;
+    this.rowIndex = 1;
+    this.rowDivider = 0;
     this.state = {
       bettingMoney: 10,
       currentMoney: 100,
@@ -27,7 +33,9 @@ class App extends Component {
       selectedCard: {},
       guess: '',
       correctSound: new Audio(correctSound),
-      wrongSound: new Audio(wrongSound)
+      wrongSound: new Audio(wrongSound),
+      loseSound: new Audio(loseSound),
+      winSound: new Audio(winSound)
     }
   }
 
@@ -43,14 +51,32 @@ class App extends Component {
         selectedCard: localStargeState.selectedCard,
         guess: localStargeState.guess,
         correctSound: new Audio(correctSound),
-        wrongSound: new Audio(wrongSound)
-      })
+        wrongSound: new Audio(wrongSound),
+        loseSound: new Audio(loseSound),
+        winSound: new Audio(winSound)
+      });
     } else {
       this.shuffleCards();
     }
   }
 
+  componentDidMount() {
+    this.canvas = this.canvasRef.current;
+    this.canvas.width = window.innerWidth * 0.8;
+    this.canvas.height = window.innerHeight * 0.8;
+    this.showImage('unknown-card.png', this.canvas.width / 2 - 31, 50);
+    const tempCardsOnTable = JSON.parse(JSON.stringify(this.state.cardsOnTable));
+    this.setState({cardsOnTable: []}, () => {
+      for (let i = 0; i < tempCardsOnTable.length; i++) {
+        this.state.cardsOnTable.push(tempCardsOnTable[i]);
+        this.setState({cardsOnTable: this.state.cardsOnTable});
+        this.drawCard(tempCardsOnTable[i]);
+      }
+    });
+  }
+
   init = () => {
+    this.clearCanvas(77, 300, window.innerWidth * 0.8, window.innerHeight * 0.8)
     this.setState({
       bettingMoney: 10,
       currentMoney: 100,
@@ -60,7 +86,9 @@ class App extends Component {
       selectedCard: {},
       guess: '',
       correctSound: new Audio(correctSound),
-      wrongSound: new Audio(wrongSound)
+      wrongSound: new Audio(wrongSound),
+      loseSound: new Audio(loseSound),
+      winSound: new Audio(winSound)
     }, () => {
       store.dispatch(setBettingCoins(this.state.bettingMoney));
       store.dispatch(setCurrentCoins(this.state.currentMoney));
@@ -80,7 +108,8 @@ class App extends Component {
   }
 
   shuffleCards = () => {
-    if (this.state.currentMoney <= 0) {
+    if (this.state.currentMoney < 1) {
+      this.state.loseSound.play();
       alert('Game over!!!');
       this.init();
       return;
@@ -103,6 +132,34 @@ class App extends Component {
     });
   }
 
+  drawCard = (card) => {
+    let index = this.state.cardsOnTable.length - this.rowDivider;
+    if (index * 77 + 154 + 400 > window.innerWidth) {
+      this.rowIndex++;
+      this.rowDivider = this.state.cardsOnTable.length - 1;
+      index = this.state.cardsOnTable.length - this.rowDivider;
+    }
+    this.showImage(`${card.number}-${card.symbol}.png`, index * 77, this.rowIndex === 1 ? this.rowIndex * 300 : this.rowIndex * 200);
+  }
+
+  showImage = (imageName, x, y) => {
+    const context = this.canvas.getContext('2d');
+    const img = new Image;
+    img.onload = () => {
+      if (imageName === 'check.svg' || imageName === 'wrong.svg') {
+        context.drawImage(img, x, y, img.width * 0.3, img.height * 0.3);
+      } else {
+        context.drawImage(img, x, y, img.width, img.height);
+      }
+    };
+    img.src = process.env.PUBLIC_URL + `/images/${imageName}`;
+  }
+
+  clearCanvas = (x, y, width, height) => {
+    const context = this.canvas.getContext('2d');
+    context.clearRect(x, y, width, height);
+  }
+
   selectCard = () => {
     if (this.state.shuffledCards && this.state.shuffledCards.length > 0) {
       const randomIndex = Math.floor(Math.random() * (this.state.shuffledCards.length - 1));
@@ -113,6 +170,7 @@ class App extends Component {
         cardsOnTable: this.state.cardsOnTable,
         shuffledCards: this.state.shuffledCards,
       }, () => {
+        this.drawCard(this.state.cardsOnTable[0]);
         store.dispatch(setCardsOnTable(this.state.cardsOnTable));
         store.dispatch(setShuffledCards(this.state.shuffledCards));
         this.setStateInLocalStorage();
@@ -146,6 +204,7 @@ class App extends Component {
       store.dispatch(setBetCoins(this.state.betMoney));
       this.setStateInLocalStorage();
       const newCard = this.state.selectedCard;
+      this.showImage(`${newCard.number}-${newCard.symbol}.png`,  this.canvas.width / 2 - 194, 50)
       const previousCard = this.state.cardsOnTable[this.state.cardsOnTable.length - 1];
       this.setState({
         selectedCard: newCard
@@ -153,6 +212,7 @@ class App extends Component {
         store.dispatch(setSelectedCard(this.state.selectedCard));
         this.setStateInLocalStorage();
         setTimeout(() => {
+          this.clearCanvas(this.canvas.width / 2 - 194, 50, 154, 240);
           if (guess > 0) {
             this.makeHigherCheck(newCard, previousCard);
           } else {
@@ -164,7 +224,6 @@ class App extends Component {
   }
 
   onBetCoinsChange = (e) => {
-    console.log(e.target.value);
     this.setState({ bettingMoney: e.target.value}, () => {
       store.dispatch(setBettingCoins(this.state.bettingMoney));
       this.setStateInLocalStorage();
@@ -172,7 +231,7 @@ class App extends Component {
   }
 
   makeHigherCheck = (newCard, previousCard) => {
-    if (newCard.number > previousCard.number) {
+    if (newCard.number >= previousCard.number) {
       this.processWin(newCard);
     } else {
       this.processLoss();
@@ -190,24 +249,28 @@ class App extends Component {
   processWin = (newCard) => {
     this.state.correctSound.play();
     this.state.cardsOnTable.push(newCard);
+    this.showImage('check.svg', this.canvas.width / 2 - 214, 103.6);
     this.setState({
       guess: 'check',
-      currentMoney: this.state.currentMoney + this.state.bettingMoney * 2,
+      currentMoney: parseInt(this.state.currentMoney, 10) + (parseInt(this.state.bettingMoney, 10) + (parseInt(this.state.bettingMoney, 10) * 0.25)),
       selectedCard: {},
       cardsOnTable: this.state.cardsOnTable
     }, () => {
       store.dispatch(setGuess(this.state.guess));
+      this.drawCard(this.state.cardsOnTable[this.state.cardsOnTable.length - 1]);
       store.dispatch(setCurrentCoins(this.state.currentMoney));
       store.dispatch(setSelectedCard(this.state.selectedCard));
       store.dispatch(setCardsOnTable(this.state.cardsOnTable));
       this.setStateInLocalStorage();
       setTimeout(() => {
+        this.clearCanvas(this.canvas.width / 2 - 214, 103.6, 173.6, 153.6);
         this.setState({
           guess: ''
         }, () => {
           store.dispatch(setGuess(this.state.guess));
           this.setStateInLocalStorage();
           if (this.state.shuffledCards && this.state.shuffledCards.length === 0) {
+            this.state.winSound.play();
             alert('You won!!!');
             this.init();
             return;
@@ -219,12 +282,14 @@ class App extends Component {
 
   processLoss = () => {
     this.state.wrongSound.play();
+    this.showImage('wrong.svg', this.canvas.width / 2 - 214, 103.6);
     this.setState({
       guess: 'wrong',
     }, () => {
       store.dispatch(setGuess(this.state.guess));
       this.setStateInLocalStorage();
       setTimeout(() => {
+        this.clearCanvas(this.canvas.width / 2 - 214, 103.6, 173.6, 153.6);
         this.postProcessLoss();
       }, 500)
     });
@@ -237,6 +302,7 @@ class App extends Component {
       cardsOnTable: [],
       selectedCard: {}
     }, () => {
+      this.clearCanvas(77, 300, window.innerWidth * 0.8, window.innerHeight * 0.8)
       store.dispatch(setGuess(this.state.guess));
       store.dispatch(setBetCoins(this.state.betMoney));
       store.dispatch(setCardsOnTable(this.state.cardsOnTable));
@@ -291,33 +357,7 @@ class App extends Component {
           </div>
         </div>
         <div className="Main">
-          {/* <img className="Guess" src={process.env.PUBLIC_URL + '/images/' + this.state.guess + '.svg'} alt=""/> */}
-          <div className="Guess">
-            {guess}
-          </div>
-          <div className="Cards">
-            <div className="CardsUnknown">
-              <img
-                src={process.env.PUBLIC_URL + '/images/' + this.state.selectedCard.number + '-' + this.state.selectedCard.symbol + '.png'}
-                alt=""
-                className={this.state.selectedCard && this.state.selectedCard.number ? 'exist' : ''}
-              />
-              <img
-                src={process.env.PUBLIC_URL + '/images/unknown-card.png'}
-                alt=""
-                className="exist"
-              />
-            </div>
-            <div className="CardsOnTable">
-              {this.state.cardsOnTable.map((card, index) => (
-                  <img
-                    key={index}
-                    alt=""
-                    src={process.env.PUBLIC_URL + '/images/' + card.number + '-' + card.symbol + '.png'}
-                  /> 
-              ))}
-            </div>
-          </div>
+          <canvas ref={this.canvasRef} width="500" height="500"></canvas>
         </div>
       </div>
     )
